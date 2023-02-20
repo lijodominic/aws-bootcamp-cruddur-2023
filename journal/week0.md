@@ -107,6 +107,9 @@ What we are going to do in this project.
 ![Conceptual Design](assets/week0_conceptual_design.jpg)
 
 * Logical Design
+<!-- Images -->
+![Logical Design](assets/week0_conceptual_design.jpg)
+
 * Physical Design
 
 
@@ -119,3 +122,4 @@ What we are going to do in this project.
 * Create an architectural diagram (to the best of your ability) the CI/CD logical pipeline in Lucid Charts
 * Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
 * Open a support ticket and request a service limit
+
