@@ -108,7 +108,7 @@ What we are going to do in this project.
 
 * Logical Design
 <!-- Images -->
-![Logical Design](assets/week0_conceptual_design.jpg)
+![Logical Design](assets/week0_logical_design.jpg)
 
 * Physical Design
 
