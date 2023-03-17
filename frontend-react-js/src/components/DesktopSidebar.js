@@ -13,7 +13,7 @@ export default function DesktopSidebar(props) {
   ]
 
   const users = [
-    { "display_name": "Lijo Dominic", "handle": "lijodominic" }
+    { "display_name": "LIjo Dominic", "handle": "lijodominic" }
   ]
 
   let trending;
