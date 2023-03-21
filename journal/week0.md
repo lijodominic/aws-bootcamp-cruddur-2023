@@ -1,125 +1,51 @@
 # Week 0 — Billing and Architecture
 
-# **Bootcamp introduction and format**
----
- 
- 
-<!-- Images -->
-![Intro Points](assets/week0_what_is_cloud_project_bootcamp.jpg)
+## Required Homework
 
-# **What are we building ?**
----
+### Billing and Budget Alarms
 
- 
-<!-- Images -->
-![Intro Points](assets/week0_what_we_are_building.jpg)
+I created billing alarms via AWS CLI
+![Screenshot of the Budget Alarm](assets/week0/budget-alarm.png)
 
+Here are JSON configuration files for reference
 
+- [alarm-config.json](../aws/json/alarm-config.json)
+- [budget-notifications-with-subscribers.json](../aws/json/budget-notifications-with-subscribers.json)
+- [budget.json](../aws/json/budget.json)
 
-# ** Project Scenario**
+### Logical Architectural diagram
 
-What we are going to do in this project.
-* You joined a startup 
-* First day of work walked into office
-* Tony (manager) sets the context of the project
-    * Fractional CTO
-    * Micro Bloging  Platform
-    * Expiring posts 
-    * NoSQL or SQL
-    * Authentication
-    * Cruddur 
-    * Scale Quickly
-    * Lot of transactions
-    * Time limited content
-    * User Content and content creation
-    * App is targeted to busy professionals, college students, Younger students. Company wants to limit the amount of trust and privacy issues
+I first created a napkin design and then recreated the architecture diagram on Lucid charts.
 
- **App Tech Stack**
- * Wire frame
- * Mock up web application  
- * Fund of 6 months salary
- * Fractional CTO is a part time teacher
- * Choice to start all over
- * ORM 
- * Monolithic application
- * Technical road map ready
- * Sprint cycle 
- 
-  
-<!-- Images -->
-![Application State](assets/week0_application_current_future_state.jpg)
+I added WAF in front of frontend application and a API gateway in front of the API. 
 
-* What we have and what we are trying to achieve 
+Please note: I will update Lucid charts in coming weeks to find correct place of cloudfront and API Gateway. 
 
+- ![Napkin Design](assets/week0/napkin-logical-design.jpg)
 
-<!-- Images -->
-![Application Layers](assets/week0_application_current_layers.jpg)
+- ![Logical Diagram](assets/week0/logical-architecture.png)
 
-**Important Note:** Business Logic is to be separated from UI. Authentication etc to be moved out. End goal is to move away from monolithic  application towards micro service application.
+Here is lucidcharts commentable link.
+[Lucidcharts commentable link](https://lucid.app/lucidchart/32957188-ff26-44b2-94a1-c993ba6a9dba/edit?viewport_loc=-53%2C-4%2C2317%2C1200%2C0_0&invitationId=inv_093d5a58-9ec3-41d5-814c-35e1aab6e0b1)
 
-**Cost Effective AWS Solution**
-    * Iron triangle - The budget. The scope. The schedule
+## Optional home work
 
-<!-- Images -->
-![Iron Triangle](assets/week0_iron_triangle.jpg)
+### CI/CD pipeline diagram on lucid charts
 
+![CI/CD diagram](assets/week0/ci-cd-pipeline.png)
 
-**Proposed Tech Stack**
-* Front end Javascript 
-* Backend API's using Python using flask
-* ORM - NoSql or Sql
+1. Code is pushed to feature branch or merged using a pull request to release, master or develop branch.
 
-**Self Notes:**
-<!-- Images -->
-![Iron Triangle](assets/week0_requirement_notes.jpg)
+2. Run code linting and unit tests to find problems in committed changes. 
 
+3. Compile and build the code. 
 
+4. Prepare a docker image with settings defined the repository and code built in last step. This step also publishes the built docker container on a container repository to be used in next step.
 
- # ** What is Good Architecture?**
- 
-<!-- Images -->
-![Good Architecture](assets/week0_good_architecture.jpg)
+5. Deploy containter with infrastructure changes (like dynamo table, SSM params etc) to a inactive instance. Traffic would not be routed to this instance yet.
 
-<!-- Images -->
-![Good Architecture](assets/week0_good_architecture2.jpg)
+6. Run Database migrations (if any)
 
-<!-- Images -->
-![Good Architecture](assets/week0_good_architecture3.jpg)
+7. Run Smoke and other health tests on in-active instance to gain confidence.
 
-**AWS considerations**
-* Well architected design
-    * Operational Excellence Pillar
-    * Reliability Pillar
-    * Security Pillar
-    * Performance Pillar
-    * Cost Optimization Pillar
-    * Sustainability Pillar
-
-
-**The C4 model for visualizing software architecure **
-
-<!-- Images -->
-![C4 Model](assets/week0_c4_pillars.jpg)
-
-
-* Conceptual Design 
-<!-- Images -->
-![Conceptual Design](assets/week0_conceptual_design.jpg)
-
-* Logical Design
-<!-- Images -->
-![Logical Design](assets/week0_logical_design.jpg)
-
-* Physical Design
-
-
-# **Homework Challenges**
-
-  
-* Destroy your root account credentials, Set MFA, IAM role
-* Use EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue.
-* Review all the questions of each pillars in the Well Architected Tool (No specialized lens)
-* Create an architectural diagram (to the best of your ability) the CI/CD logical pipeline in Lucid Charts
-* Research the technical and service limits of specific services and how they could impact the technical path for technical flexibility. 
-* Open a support ticket and request a service limit
-
+8. Switch the instance and route traffic to the new instance.
