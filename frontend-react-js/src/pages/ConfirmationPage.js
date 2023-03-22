@@ -1,102 +1,95 @@
-import './SignupPage.css';
+import './ConfirmationPage.css';
 import React from "react";
-import { ReactComponent as Logo } from '../components/svg/logo.svg';
-import { Link } from "react-router-dom";
+import { useParams } from 'react-router-dom';
+import {ReactComponent as Logo} from '../components/svg/logo.svg';
 
 import { Auth } from 'aws-amplify';
 
-export default function SignupPage() {
-
-  // Username is Eamil
-  const [name, setName] = React.useState('');
+export default function ConfirmationPage() {
   const [email, setEmail] = React.useState('');
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [code, setCode] = React.useState('');
+  const [codeSent, setCodeSent] = React.useState(false);
   const [errors, setErrors] = React.useState('');
+
+  const params = useParams();
+
+  const code_onchange = (event) => {
+    setCode(event.target.value);
+  }
+  const email_onchange = (event) => {
+    setEmail(event.target.value);
+  }
+
+  const resend_code = async (event) => {
+    setErrors('')
+    try {
+      await Auth.resendSignUp(email);
+      console.log('code resent successfully');
+      setCodeSent(true)
+    } catch (err) {
+      // does not return a code
+      // does cognito always return english
+      // for this to be an okay match?
+      console.log(err)
+      if (err.message == 'Username cannot be empty'){
+        setErrors("You need to provide an email in order to send Resend Activiation Code")   
+      } else if (err.message == "Username/client id combination not found."){
+        setErrors("Email is invalid or cannot be found.")   
+      }
+    }
+  }
 
   const onsubmit = async (event) => {
     event.preventDefault();
     setErrors('')
     try {
-      const { user } = await Auth.signUp({
-        username: email,
-        password: password,
-        attributes: {
-          name: name,
-          email: email,
-          preferred_username: username,
-        },
-        autoSignIn: { // optional - enables auto sign in after user is confirmed
-          enabled: true,
-        }
-      });
-      console.log(user);
-      window.location.href = `/confirm?email=${email}`
-    } catch (error) {
-      console.log(error);
-      setErrors(error.message)
+      await Auth.confirmSignUp(email, code);
+      window.location.href = "/"
+    } catch (err) {
+      setErrors(err.message)
     }
     return false
   }
 
-  const name_onchange = (event) => {
-    setName(event.target.value);
+  let code_button;
+  if (codeSent){
+    code_button = <div className="sent-message">A new activation code has been sent to your email</div>
+  } else {
+    code_button = <button className="resend" onClick={resend_code}>Resend Activation Code</button>;
   }
-  const email_onchange = (event) => {
-    setEmail(event.target.value);
-  }
-  const username_onchange = (event) => {
-    setUsername(event.target.value);
-  }
-  const password_onchange = (event) => {
-    setPassword(event.target.value);
-  }
+
+  React.useEffect(()=>{
+    if (params.email) {
+      setEmail(params.email)
+    }
+  }, [])
 
   return (
-    <article className='signup-article'>
-      <div className='signup-info'>
+    <article className="confirm-article">
+      <div className='recover-info'>
         <Logo className='logo' />
       </div>
-      <div className='signup-wrapper'>
+      <div className='recover-wrapper'>
         <form
-          className='signup_form'
+          className='confirm_form'
           onSubmit={onsubmit}
         >
-          <h2>Sign up to create a Cruddur account</h2>
+          <h2>Confirm your Email</h2>
           <div className='fields'>
-            <div className='field text_field name'>
-              <label>Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={name_onchange}
-              />
-            </div>
-
             <div className='field text_field email'>
               <label>Email</label>
               <input
                 type="text"
                 value={email}
-                onChange={email_onchange}
+                onChange={email_onchange} 
               />
             </div>
-
-            <div className='field text_field username'>
-              <label>Username</label>
+            <div className='field text_field code'>
+              <label>Confirmation Code</label>
               <input
                 type="text"
-                value={username}
-                onChange={username_onchange}
-              />
-            </div>
-
-            <div className='field text_field password'>
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={password_onchange}
+                value={code}
+                onChange={code_onchange} 
               />
             </div>
           </div>
@@ -104,16 +97,11 @@ export default function SignupPage() {
           {errors && <div className='errors'>{errors}</div>}
 
           <div className='submit'>
-            <button type='submit'>Sign Up</button>
+            <button type='submit'>Confirm Email</button>
           </div>
         </form>
-        <div className="already-have-an-account">
-          <span>
-            Already have an account?
-          </span>
-          <Link to="/signin">Sign in!</Link>
-        </div>
       </div>
+      {code_button}
     </article>
   );
 }
