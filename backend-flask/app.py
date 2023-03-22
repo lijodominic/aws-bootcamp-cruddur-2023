@@ -1,7 +1,12 @@
 from flask import Flask
 from flask import request
-from flask_cors import CORS, cross_origin
+from flask import jsonify
 import os
+import sys
+from flask_cors import CORS, cross_origin
+
+# Cognito --
+from flask_awscognito import AWSCognitoAuthentication
 
 from services.home_activities import *
 from services.user_activities import *
@@ -19,13 +24,13 @@ import watchtower
 import logging
 from time import strftime
 
-# # Configuring Logger to Use CloudWatch
-# LOGGER = logging.getLogger(__name__)
-# LOGGER.setLevel(logging.DEBUG)
-# console_handler = logging.StreamHandler()
-# cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
-# LOGGER.addHandler(console_handler)
-# LOGGER.addHandler(cw_handler)
+# Configuring Logger to Use CloudWatch
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+LOGGER.addHandler(console_handler)
+LOGGER.addHandler(cw_handler)
 
 # Honeycomb imports
 from opentelemetry import trace
@@ -41,6 +46,9 @@ from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProces
 import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
+
+
+from services.middlewares.auth_cognito import auth_cognito
 
 # Initialize and send data to Honeycomb
 provider = TracerProvider()
@@ -58,17 +66,21 @@ tracer = trace.get_tracer(__name__)
 
 # Initialize automatic instrumentation with Flask
 app = Flask(__name__)
+app.config['COGNITO_REGION'] = os.getenv('AWS_DEFAULT_REGION')
+app.config['AWS_COGNITO_USER_POOL_ID'] = os.getenv('AWS_COGNITO_USER_POOL_ID')
+app.config['AWS_COGNITO_USER_POOL_CLIENT_ID'] = os.getenv('AWS_COGNITO_USER_POOL_CLIENT_ID')
+
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
-
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
+  allow_headers="content-type,if-modified-since",
   headers=['Content-Type', 'Authorization'], 
-  expose_headers='Authorization',
+  expose_headers='Authorization,location,link',
   methods="OPTIONS,GET,HEAD,POST"
 )
 
@@ -138,8 +150,9 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 @cross_origin()
-def data_home():
-  data = HomeActivities.run()
+@auth_cognito
+def data_home(current_user):
+  data = HomeActivities.run(current_user)
   return data, 200
 
 
