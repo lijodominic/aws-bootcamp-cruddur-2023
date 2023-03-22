@@ -14,8 +14,8 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN}
       AWS_COGNITO_USER_POOL_ID: "ap-southeast-2_pgFtYFA6U"
-      AWS_COGNITO_USER_POOL_CLIENT_ID: "7m7263nhomph60dtg6c1n1c9s6"
-      AWS_COGNITO_USER_POOL_CLIENT_SECRET: "7m7263nhomph60dtg6c1n1c9s6"
+      AWS_COGNITO_USER_POOL_CLIENT_ID: "4s9vo0mu3i1fs0mqro132nib7m"
+      AWS_COGNITO_USER_POOL_CLIENT_SECRET: "4s9vo0mu3i1fs0mqro132nib7m"
     build: ./backend-flask
     ports:
       - "4567:4567"
@@ -33,8 +33,8 @@ services:
       REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       REACT_APP_AWS_PROJECT_REGION: ${AWS_DEFAULT_REGION}
       REACT_APP_AWS_COGNITO_REGION: ${AWS_DEFAULT_REGION}
-      REACT_APP_AWS_USER_POOLS_ID: "ap-southeast-2_pgFtYFA6U"
-      REACT_APP_CLIENT_ID: "7m7263nhomph60dtg6c1n1c9s6"
+      REACT_APP_AWS_USER_POOLS_ID: "ap-southeast-2_ayj2jfYaK"
+      REACT_APP_CLIENT_ID: "4s9vo0mu3i1fs0mqro132nib7m"
     build: ./frontend-react-js
     ports:
       - "3000:3000"
@@ -60,7 +60,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
-    volumes: 
+    volumes:
       - db:/var/lib/postgresql/data
 
   dynamodb-local:
@@ -78,7 +78,7 @@ services:
 
 # the name flag is a hack to change the default prepend folder
 # name when outputting the image names
-networks: 
+networks:
   internal-network:
     driver: bridge
     name: cruddur
