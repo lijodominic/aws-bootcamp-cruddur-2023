@@ -4,15 +4,16 @@ from opentelemetry import trace
 tracer = trace.get_tracer("home.activities")
 
 class HomeActivities:
-  def run(current_user):
-    # logger.info("HomeActivities")
+  def run(cognito_user_id=None):
+    #logger.info("HomeActivities")
     with tracer.start_as_current_span("home-activites-mock-data"):
       span = trace.get_current_span()
       now = datetime.now(timezone.utc).astimezone()
       span.set_attribute("app.now", now.isoformat())
+
       results = [{
         'uuid': '68f126b0-1ceb-4a33-88be-d90fa7109eee',
-        'handle':   current_user["username"],
+        'handle':  'Lijo Dominic',
         'message': 'Cloud is very fun!',
         'created_at': (now - timedelta(days=2)).isoformat(),
         'expires_at': (now + timedelta(days=5)).isoformat(),
@@ -50,10 +51,9 @@ class HomeActivities:
       }
       ]
 
-
-      if current_user["authenticated"]:
+      if cognito_user_id != None:
         extra_crud = {
-          'uuid': '248959df-3079-4947-b847-9e0892d1bab3',
+          'uuid': '248959df-3079-4947-b847-9e0892d1bab4',
           'handle':  'Lore',
           'message': 'My dear brother, it the humans that are the problem',
           'created_at': (now - timedelta(hours=1)).isoformat(),
@@ -62,7 +62,6 @@ class HomeActivities:
           'replies': []
         }
         results.insert(0,extra_crud)
-
 
       span.set_attribute("app.result_length", len(results))
       return results
