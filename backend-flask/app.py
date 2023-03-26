@@ -5,7 +5,7 @@ import os
 import sys
 
 from services.home_activities import *
-from services.notifications_activities import *
+from services.notification_activities import *
 from services.user_activities import *
 from services.create_activity import *
 from services.create_reply import *
@@ -15,7 +15,7 @@ from services.messages import *
 from services.create_message import *
 from services.show_activity import *
 
-from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from lib.cognito_jwt_verify import CognitoJwtToken, extract_access_token, TokenVerifyError
 
 # HoneyComb ---------
 from opentelemetry import trace
@@ -163,6 +163,7 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 @xray_recorder.capture('activities_home')
+@cross_origin()
 def data_home():
   access_token = extract_access_token(request.headers)
   try:
