@@ -162,7 +162,7 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
-@xray_recorder.capture('activities_home')
+# @xray_recorder.capture('activities_home')
 @cross_origin()
 def data_home():
   access_token = extract_access_token(request.headers)
